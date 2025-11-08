@@ -7,27 +7,66 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}"/>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial@4"></script>
 </head>
 <body>
-<h1 th:text="${title}">Следене на акции</h1>
-
-<div id="stocks-container">
-    <div class="stock-card" th:each="stock : ${stocks}">
-        <div class="symbol" th:text="${stock.symbol}">AAPL</div>
-        <div class="company-name" th:text="${stock.companyName}">Apple Inc.</div>
-        <div class="price">$<span th:text="${stock.currentPrice}">150.00</span></div>
-        <div class="change" th:classappend="${stock.changePercent >= 0} ? 'positive' : 'negative'">
-            <span th:text="${stock.changePercent >= 0} ? '▲' : '▼'">▲</span>
-            <span th:text="${stock.changePercent}">0.00</span>%
-        </div>
-        <div class="volume">
-            Обем: <span th:text="${#numbers.formatInteger(stock.volume, 0, 'COMMA')}">0</span>
+<div class="container">
+    <!-- Header с търсачка -->
+    <div class="header">
+        <h1 th:text="${title}">Следене на акции</h1>
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Търси акция по символ или име..." />
         </div>
     </div>
-</div>
 
-<div class="last-updated" id="last-updated">
-    Последно обновяване: <span id="update-time"></span>
+    <!-- Ляв sidebar със списък на акциите -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            Моите акции (<span id="stocks-count">0</span>)
+        </div>
+        <ul id="stocks-list">
+            <!-- Динамично зареждане на списъка -->
+        </ul>
+    </div>
+
+    <!-- Дясна част с графиката -->
+    <div class="main-content">
+        <div id="chart-section" class="no-selection">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <h3>Изберете акция</h3>
+            <p>Кликнете върху акция от списъка, за да видите графиката</p>
+        </div>
+        
+        <div id="chart-container" class="chart-container" style="display: none;">
+            <div class="chart-header">
+                <div>
+                    <div class="chart-title" id="selected-stock-name">Apple Inc.</div>
+                    <div style="color: #999; font-size: 0.9rem; margin-top: 0.25rem;" id="selected-stock-symbol">AAPL</div>
+                </div>
+                <div class="chart-info">
+                    <div class="chart-price" id="selected-stock-price">$150.00</div>
+                    <div class="chart-change positive" id="selected-stock-change">▲ 2.50%</div>
+                </div>
+            </div>
+            <div class="intervals">
+                <button class="interval-btn active" data-interval="5s">5s</button>
+                <button class="interval-btn" data-interval="1m">1m</button>
+                <button class="interval-btn" data-interval="5m">5m</button>
+                <button class="interval-btn" data-interval="1h">1h</button>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="stockChart"></canvas>
+            </div>
+            <div class="last-updated">
+                Последно обновяване: <span id="update-time"></span>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script th:src="@{/js/stocks.js}"></script>
