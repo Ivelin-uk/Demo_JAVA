@@ -3,35 +3,33 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title th:text="${title}">Hello</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; margin: 2rem; }
-        h1 { margin-bottom: 1rem; }
-        table { border-collapse: collapse; width: 420px; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background: #f6f8fa; text-align: left; }
-        tr:nth-child(even) { background: #fafbfc; }
-    </style>
+    <title th:text="${title}">Следене на акции</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
-<h1 th:text="${title}">Hello</h1>
+<h1 th:text="${title}">Следене на акции</h1>
 
-<table>
-    <thead>
-    <tr>
-        <th>#</th>
-        <th>Име</th>
-        <th>Цена</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="item : ${items}">
-        <td th:text="${item.id}">1</td>
-        <td th:text="${item.name}">Пример</td>
-        <td th:text="${item.price}">0.00</td>
-    </tr>
-    </tbody>
-</table>
+<div id="stocks-container">
+    <div class="stock-card" th:each="stock : ${stocks}">
+        <div class="symbol" th:text="${stock.symbol}">AAPL</div>
+        <div class="company-name" th:text="${stock.companyName}">Apple Inc.</div>
+        <div class="price">$<span th:text="${stock.currentPrice}">150.00</span></div>
+        <div class="change" th:classappend="${stock.changePercent >= 0} ? 'positive' : 'negative'">
+            <span th:text="${stock.changePercent >= 0} ? '▲' : '▼'">▲</span>
+            <span th:text="${stock.changePercent}">0.00</span>%
+        </div>
+        <div class="volume">
+            Обем: <span th:text="${#numbers.formatInteger(stock.volume, 0, 'COMMA')}">0</span>
+        </div>
+    </div>
+</div>
 
+<div class="last-updated" id="last-updated">
+    Последно обновяване: <span id="update-time"></span>
+</div>
+
+<script th:src="@{/js/stocks.js}"></script>
 </body>
 </html>
